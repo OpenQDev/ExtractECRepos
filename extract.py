@@ -93,6 +93,18 @@ def write_combined_toml(output_file, repo_urls):
             f.write(f'url = "{url}"\n')
     print(f"Combined TOML file written to {output_file}")
 
+def write_combined_csv(output_file, repo_urls):
+    """Write the combined CSV file with repo owner, repo name, and links."""
+    with open(output_file, 'w') as f:
+        f.write("repo_name,repo_link\n")
+        for url in repo_urls:
+            parts = url.split('/')
+            repo_owner = parts[-2]
+            repo_name = parts[-1].replace('.git', '')
+            f.write(f'{repo_owner}/{repo_name},{url}\n')
+    print(f"Combined CSV file written to {output_file}")
+
+
 def main(repo_url, original_toml_filename):
     clone_dir = repo_url.split('/')[-1].replace('.git', '')
     clone_repo(repo_url, clone_dir)
@@ -123,8 +135,12 @@ def main(repo_url, original_toml_filename):
 
     repo_urls = list(set(extract_repo_urls(toml_files_to_check)))
     print(f"Extracted a total of {len(repo_urls)} unique repo URLs")
+
     output_toml_filename = original_toml_filename.replace('.toml', '_combined.toml')
     write_combined_toml(output_toml_filename, repo_urls)
+
+    output_csv_filename = original_toml_filename.replace('.toml', '_combined.csv')
+    write_combined_csv(output_csv_filename, repo_urls)
 
 if __name__ == '__main__':
     ELECTRIC_CAPITAL_REPO_URL = "https://github.com/electric-capital/crypto-ecosystems"
