@@ -16,3 +16,5 @@ Data from: [Electric Capital](https://github.com/electric-capital/crypto-ecosyst
 For example, to get all repo urls for the Polygon ecosystem & sub ecosystems:
 
 `python3 extract.py polygon.toml`
+
+2. get your toml and csv file from the results folder
