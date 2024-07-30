@@ -135,10 +135,13 @@ def main(repo_url, original_toml_filename):
     repo_urls = list(set(extract_repo_urls(toml_files_to_check)))
     print(f"Extracted a total of {len(repo_urls)} unique repo URLs")
 
-    output_toml_filename = original_toml_filename.replace('.toml', '_combined.toml')
+    if not os.path.exists("results"):
+        os.makedirs("results")
+
+    output_toml_filename = os.path.join("results", original_toml_filename.replace('.toml', '_combined.toml'))
     write_combined_toml(output_toml_filename, repo_urls)
 
-    output_csv_filename = original_toml_filename.replace('.toml', '_combined.csv')
+    output_csv_filename = os.path.join("results", original_toml_filename.replace('.toml', '_combined.csv'))
     write_combined_csv(output_csv_filename, repo_urls)
 
 if __name__ == '__main__':
