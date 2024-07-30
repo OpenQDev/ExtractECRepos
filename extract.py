@@ -95,7 +95,7 @@ def main(repo_url, original_toml_filename, output_toml_filename):
     toml_files_to_check.sort(key=str.lower)
     print(f"Combining {len(toml_files_to_check)} sub-ecosystem TOML files")
 
-    repo_urls = extract_repo_urls(toml_files_to_check)
+    repo_urls = list(set(extract_repo_urls(toml_files_to_check)))
     print(f"Extracted a total of {len(repo_urls)} repo URLs")
     write_combined_toml(output_toml_filename, repo_urls)
 
