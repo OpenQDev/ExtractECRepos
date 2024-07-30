@@ -88,9 +88,8 @@ def extract_repo_urls_recursive(toml_file):
 def write_combined_toml(output_file, repo_urls):
     """Write the combined TOML file with all [[repo]] links."""
     with open(output_file, 'w') as f:
-        f.write('[repo]\n')
         for url in repo_urls:
-            f.write(f'url = "{url}"\n')
+            f.write(f'[[repo]]\nurl = "{url}"\n\n')
     print(f"Combined TOML file written to {output_file}")
 
 def write_combined_csv(output_file, repo_urls):
