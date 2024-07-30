@@ -3,6 +3,8 @@ import toml
 import git
 import sys
 
+TOML_EXTENSION = '.toml'
+
 def clone_repo(repo_url, clone_dir):
     """Clone a Git repository to a specified directory if it doesn't exist, otherwise pull."""
     if os.path.exists(clone_dir):
@@ -51,7 +53,7 @@ def find_all_toml_files(base_dir):
     toml_files = []
     for root, dirs, files in os.walk(base_dir):
         for file in files:
-            if file.endswith('.toml'):
+            if file.endswith(TOML_EXTENSION):
                 toml_files.append(os.path.join(root, file))
     return toml_files
 
@@ -77,7 +79,7 @@ def extract_repo_urls_recursive(toml_file):
         if len(sub_ecosystems) > 0: 
             print(f"Found {len(sub_ecosystems)} sub-ecosystems in {toml_file}: {sub_ecosystems}")
         for sub_ecosystem in sub_ecosystems:
-            sub_ecosystem_file = find_toml_file(os.path.dirname(toml_file), sub_ecosystem + '.toml')
+            sub_ecosystem_file = find_toml_file(os.path.dirname(toml_file), sub_ecosystem + TOML_EXTENSION)
             
             if sub_ecosystem_file:
                 urls.extend(extract_repo_urls_recursive(sub_ecosystem_file))
@@ -123,7 +125,7 @@ def main(repo_url, original_toml_filename):
     
     toml_files_to_check_set = set([original_toml_file])
     for ecosystem_file in sub_ecosystems:
-        found_toml_file = find_toml_file(clone_dir, ecosystem_file + '.toml')
+        found_toml_file = find_toml_file(clone_dir, ecosystem_file + TOML_EXTENSION)
         if found_toml_file:
             # print(f"Adding ub-ecosystem file: {found_toml_file}")
             toml_files_to_check_set.add(found_toml_file)
@@ -138,10 +140,10 @@ def main(repo_url, original_toml_filename):
     if not os.path.exists("results"):
         os.makedirs("results")
 
-    output_toml_filename = os.path.join("results", original_toml_filename.replace('.toml', '_combined.toml'))
+    output_toml_filename = os.path.join("results", original_toml_filename.replace(TOML_EXTENSION, '_combined.toml'))
     write_combined_toml(output_toml_filename, repo_urls)
 
-    output_csv_filename = os.path.join("results", original_toml_filename.replace('.toml', '_combined.csv'))
+    output_csv_filename = os.path.join("results", original_toml_filename.replace(TOML_EXTENSION, '_combined.csv'))
     write_combined_csv(output_csv_filename, repo_urls)
 
 if __name__ == '__main__':
