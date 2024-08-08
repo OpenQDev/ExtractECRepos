@@ -32,11 +32,11 @@ def extract_sub_ecosystems(toml_file):
             return []
 
         # finding all the sub-ecosystems
-        transformed_ecosystems = [s.lower().replace('.', '-').replace(' (', '-').replace(')', '').replace(' ', '-') for s in sub_ecosystems]
+        transformed_ecosystems = [s.lower().replace('  ', ' ').replace('.', '-').replace(' (', '-').replace(')', '').replace(' ', '-') for s in sub_ecosystems]
         print(f"Found {len(transformed_ecosystems)} sub-ecosystems overall")
 
         # when there are brackets, the subecosystem file could also be just the first word 
-        transformed_ecosystems_brackets = [s.lower().split(' (')[0].replace(' ', '-') for s in sub_ecosystems if '(' in s]
+        transformed_ecosystems_brackets = [s.lower().replace('  ', ' ').split(' (')[0].replace(' ', '-') for s in sub_ecosystems if '(' in s]
         if len(transformed_ecosystems_brackets) > 0:
             print(f"Found {len(transformed_ecosystems_brackets)} sub-ecosystems which include brackets")
 
