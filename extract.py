@@ -119,7 +119,6 @@ def main(repo_url, original_toml_filename):
     sub_ecosystems = extract_sub_ecosystems(original_toml_file)
     if not sub_ecosystems:
         print(f"No 'sub_ecosystems' found in {original_toml_filename}.")
-        return
     
     all_toml_files = find_all_toml_files(clone_dir)
     print(f"Looking through {len(all_toml_files)} TOML files in the repository...")
