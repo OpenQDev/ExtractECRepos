@@ -2,6 +2,7 @@ import os
 import toml
 import git
 import sys
+import re
 
 TOML_EXTENSION = '.toml'
 
@@ -16,11 +17,17 @@ def clone_repo(repo_url, clone_dir):
         print(f"Cloning repository from {repo_url} into {clone_dir}...")
         git.Repo.clone_from(repo_url, clone_dir)
 
+def purify_string(input_string):
+    # Remove non-alphanumeric characters and convert to lowercase
+    return ''.join(re.findall(r'\w+', input_string)).lower()
+
 def find_toml_file(base_dir, filename):
     """Recursively search for a TOML file with the given filename."""
     for root, dirs, files in os.walk(base_dir):
-        if filename in files:
-            return os.path.join(root, filename)
+        purified_filename = purify_string(filename)
+        for file_to_check in files:
+            if purify_string(file_to_check) == purified_filename:
+                return os.path.join(root, file_to_check)
     return None
 
 def extract_sub_ecosystems(toml_file):
@@ -30,21 +37,8 @@ def extract_sub_ecosystems(toml_file):
         sub_ecosystems = data.get('sub_ecosystems', [])
         if not sub_ecosystems:
             return []
-
-        # finding all the sub-ecosystems
-        transformed_ecosystems = [s.lower().replace('  ', ' ').replace('.', '-').replace(' (', '-').replace(')', '').replace(' ', '-') for s in sub_ecosystems]
-        print(f"Found {len(transformed_ecosystems)} sub-ecosystems overall")
-
-        # when there are brackets, the subecosystem file could also be just the first word 
-        transformed_ecosystems_brackets = [s.lower().replace('  ', ' ').split(' (')[0].replace(' ', '-') for s in sub_ecosystems if '(' in s]
-        if len(transformed_ecosystems_brackets) > 0:
-            print(f"Found {len(transformed_ecosystems_brackets)} sub-ecosystems which include brackets")
-
-        transformed_ecosystems.extend(transformed_ecosystems_brackets)
-        
-        transformed_ecosystems = list(set(transformed_ecosystems))
-        print(f"Found {len(transformed_ecosystems)} potential sub-ecosystem files")
-        return transformed_ecosystems
+        return sub_ecosystems
+    
     except Exception as e:
         print(f"Error reading {toml_file}: {e}")
         return []
