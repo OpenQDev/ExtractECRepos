@@ -22,12 +22,20 @@ def purify_string(input_string):
     return ''.join(re.findall(r'\w+', input_string)).lower()
 
 def find_toml_file(base_dir, filename):
-    """Recursively search for a TOML file with the given filename."""
+    """Find a file."""
+    purified_filename = purify_string(filename)
     for root, dirs, files in os.walk(base_dir):
-        purified_filename = purify_string(filename)
         for file_to_check in files:
             if purify_string(file_to_check) == purified_filename:
                 return os.path.join(root, file_to_check)
+    return None
+
+def match_toml_file(all_toml_files, filename):
+    """Match a file with the exhaustive liste of toml filenames."""
+    purified_filename = purify_string(filename)
+    for file_to_check in all_toml_files:
+        if purified_filename in purify_string(file_to_check):
+            return file_to_check
     return None
 
 def extract_sub_ecosystems(toml_file):
@@ -52,14 +60,14 @@ def find_all_toml_files(base_dir):
                 toml_files.append(os.path.join(root, file))
     return toml_files
 
-def extract_repo_urls(toml_files):
+def extract_repo_urls(all_toml_files, toml_files):
     """Extract [[repo]] URL links from a list of TOML files."""
     repo_urls = []
     for file in toml_files:
-        repo_urls.extend(extract_repo_urls_recursive(file))
+        repo_urls.extend(extract_repo_urls_recursive(all_toml_files, file))
     return repo_urls
 
-def extract_repo_urls_recursive(toml_file):
+def extract_repo_urls_recursive(all_toml_files, toml_file):
     """Recursively extract [[repo]] URL links from a TOML file and its sub-ecosystems."""
     urls = []
     try:
@@ -74,10 +82,10 @@ def extract_repo_urls_recursive(toml_file):
         if len(sub_ecosystems) > 0: 
             print(f"Found {len(sub_ecosystems)} sub-ecosystems in {toml_file}: {sub_ecosystems}")
         for sub_ecosystem in sub_ecosystems:
-            sub_ecosystem_file = find_toml_file(os.path.dirname(toml_file), sub_ecosystem + TOML_EXTENSION)
+            sub_ecosystem_file = match_toml_file(all_toml_files, sub_ecosystem + TOML_EXTENSION)
             
             if sub_ecosystem_file:
-                urls.extend(extract_repo_urls_recursive(sub_ecosystem_file))
+                urls.extend(extract_repo_urls_recursive(all_toml_files, sub_ecosystem_file))
     except Exception as e:
         print(f"Error reading {toml_file}: {e}")
     return urls
@@ -110,25 +118,27 @@ def main(repo_url, original_toml_filename):
         print(f"File {original_toml_filename} not found in the repository.")
         return
     
+    all_toml_files = find_all_toml_files(clone_dir)
+    print(f"Looking through {len(all_toml_files)} TOML files in the repository...")
+
     sub_ecosystems = extract_sub_ecosystems(original_toml_file)
     if not sub_ecosystems:
         print(f"No 'sub_ecosystems' found in {original_toml_filename}.")
     
-    all_toml_files = find_all_toml_files(clone_dir)
-    print(f"Looking through {len(all_toml_files)} TOML files in the repository...")
-    
     toml_files_to_check_set = set([original_toml_file])
     for ecosystem_file in sub_ecosystems:
-        found_toml_file = find_toml_file(clone_dir, ecosystem_file + TOML_EXTENSION)
+        if ecosystem_file == "The LAOs Chain (KLAOS)":
+            print(f"Skipping {ecosystem_file}")
+        found_toml_file = match_toml_file(all_toml_files, ecosystem_file + TOML_EXTENSION)
         if found_toml_file:
             # print(f"Adding ub-ecosystem file: {found_toml_file}")
             toml_files_to_check_set.add(found_toml_file)
 
     toml_files_to_check = list(toml_files_to_check_set)
     toml_files_to_check.sort(key=str.lower)
-    print(f"Combining {len(toml_files_to_check)} sub-ecosystem TOML files")
+    # print(f"Combining {toml_files_to_check} sub-ecosystem TOML files")
 
-    repo_urls = list(set(extract_repo_urls(toml_files_to_check)))
+    repo_urls = list(set(extract_repo_urls(all_toml_files, toml_files_to_check)))
     print(f"Extracted a total of {len(repo_urls)} unique repo URLs")
 
     if not os.path.exists("results"):
