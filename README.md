@@ -17,4 +17,23 @@ For example, to get all repo urls for the Polygon ecosystem & sub ecosystems:
 
 `python3 extract.py polygon.toml`
 
-2. get your toml and csv file from the results folder
+2. get your toml and csv file from the /results folder
+
+
+
+## Compare two csv files for their links
+
+This script will automatically look for any columns called "repo_link" or "githubLink" in two csv
+files and output a summary of the repos that are new to one or the other file.
+
+Same pre-requisites as mentioned above
+
+1. in the CLI:
+
+`python3 compareCSV.py <csv_file_name1> <csv_file_name2>`
+
+For example:
+
+`python3 compareCSV.py polygon.csv polygon_new.csv`
+
+1. get your toml and csv file from the /comparison-results folder
