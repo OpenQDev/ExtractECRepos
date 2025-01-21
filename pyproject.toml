@@ -1,0 +1,17 @@
+[tool.poetry]
+name = "extractecrepos"
+version = "0.1.0"
+description = ""
+authors = ["Alex Martinez <alexmartinez.mm98@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.13"
+toml = "^0.10.2"
+requests = "^2.32.3"
+gitpython = "^3.1.44"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
